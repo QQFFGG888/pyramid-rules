@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>金字塔式教程生成 · 结构图</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #ffffff; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="c" width="900" height="560"></canvas>
+<script>
+var c = document.getElementById('c');
+var g = c.getContext('2d');
+var F = '"Microsoft YaHei","PingFang SC",sans-serif';
+var INK = '#1f2933', SUB = '#6b7785', LINE = '#c9d1d9', ACC = '#2f6f8f', SOFT = '#eef3f7';
+
+function rrect(x, y, w, h, r) {
+  g.beginPath();
+  g.moveTo(x + r, y);
+  g.lineTo(x + w - r, y);
+  g.quadraticCurveTo(x + w, y, x + w, y + r);
+  g.lineTo(x + w, y + h - r);
+  g.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  g.lineTo(x + r, y + h);
+  g.quadraticCurveTo(x, y + h, x, y + h - r);
+  g.lineTo(x, y + r);
+  g.quadraticCurveTo(x, y, x + r, y);
+  g.closePath();
+}
+function trap(cx, y, h, wBottom, wTop, fill, stroke) {
+  g.beginPath();
+  g.moveTo(cx - wBottom / 2, y + h);
+  g.lineTo(cx + wBottom / 2, y + h);
+  g.lineTo(cx + wTop / 2, y);
+  g.lineTo(cx - wTop / 2, y);
+  g.closePath();
+  g.fillStyle = fill; g.fill();
+  g.strokeStyle = stroke; g.lineWidth = 1; g.stroke();
+}
+function arrow(x1, y1, x2, y2, color) {
+  g.strokeStyle = color; g.fillStyle = color; g.lineWidth = 1.5;
+  g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
+  var a = Math.atan2(y2 - y1, x2 - x1);
+  g.beginPath();
+  g.moveTo(x2, y2);
+  g.lineTo(x2 - 7 * Math.cos(a - 0.45), y2 - 7 * Math.sin(a - 0.45));
+  g.lineTo(x2 - 7 * Math.cos(a + 0.45), y2 - 7 * Math.sin(a + 0.45));
+  g.closePath(); g.fill();
+}
+
+g.fillStyle = '#ffffff'; g.fillRect(0, 0, 900, 560);
+
+g.fillStyle = INK; g.font = '600 20px ' + F;
+g.fillText('金字塔式教程生成 · 结构图', 40, 44);
+g.fillStyle = SUB; g.font = '13px ' + F;
+g.fillText('左：全篇四层；右：一个概念单元的四段；下：交付前的两道校验。', 40, 66);
+
+// 左：四层金字塔
+var cx = 230, layers = [
+  { t: 'L1 生活比喻', s: '建立直觉', y: 382, wb: 300, wt: 250 },
+  { t: 'L2 术语对照', s: '知晓名词', y: 318, wb: 250, wt: 200 },
+  { t: 'L3 技术语言', s: '准确理解', y: 254, wb: 200, wt: 160 },
+  { t: 'L4 实操配置', s: '便于上手', y: 190, wb: 160, wt: 120 }
+];
+for (var i = 0; i < layers.length; i++) {
+  var L = layers[i];
+  trap(cx, L.y, 58, L.wb, L.wt, i === 3 ? '#dbe6ee' : (i === 0 ? '#eef3f7' : '#e6edf3'), LINE);
+  g.fillStyle = INK; g.font = '600 15px ' + F;
+  g.textAlign = 'center';
+  g.fillText(L.t, cx, L.y + 27);
+  g.fillStyle = SUB; g.font = '12px ' + F;
+  g.fillText(L.s, cx, L.y + 45);
+  g.textAlign = 'left';
+}
+g.fillStyle = SUB; g.font = '12px ' + F;
+g.fillText('起点恒为 L1，逐层向上，不跳层', 92, 462);
+
+// 右：概念单元四段
+var bx = 470, bw = 380;
+var segs = [
+  { t: '原文段（如有）', s: '有门槛的原文，与解释不隔开' },
+  { t: '精读段', s: '技术解释，措辞准确' },
+  { t: '浅读段', s: '通俗落回读者语言' },
+  { t: '收尾段', s: '小结、实操、承接下文' }
+];
+for (var j = 0; j < segs.length; j++) {
+  var y = 110 + j * 86;
+  rrect(bx, y, bw, 58, 8);
+  g.fillStyle = j === 0 ? '#f4f7fa' : '#ffffff'; g.fill();
+  g.strokeStyle = LINE; g.lineWidth = 1; g.stroke();
+  g.fillStyle = INK; g.font = '600 15px ' + F;
+  g.fillText(segs[j].t, bx + 16, y + 25);
+  g.fillStyle = SUB; g.font = '12px ' + F;
+  g.fillText(segs[j].s, bx + 16, y + 43);
+  if (j < segs.length - 1) { arrow(bx + bw / 2, y + 58, bx + bw / 2, y + 86, ACC); }
+}
+g.fillStyle = SUB; g.font = '12px ' + F;
+g.fillText('术语首现标编号，文末速查表收口', bx, 462);
+
+// 下：两道校验
+g.fillStyle = '#f7f9fb'; rrect(40, 486, 820, 54, 8); g.fill();
+g.strokeStyle = LINE; g.lineWidth = 1; g.stroke();
+g.fillStyle = INK; g.font = '600 14px ' + F;
+g.fillText('第一关 脚本机械项', 64, 512);
+g.fillStyle = SUB; g.font = '12px ' + F;
+g.fillText('计数要求为 0，理解成本设上限', 64, 530);
+arrow(250, 513, 320, 513, ACC);
+g.fillStyle = INK; g.font = '600 14px ' + F;
+g.fillText('第二关 人工核对', 344, 512);
+g.fillStyle = SUB; g.font = '12px ' + F;
+g.fillText('清单逐条判读', 344, 530);
+arrow(500, 513, 570, 513, ACC);
+g.fillStyle = INK; g.font = '600 14px ' + F;
+g.fillText('任一不过即返工，不带病交付', 594, 512);
+</script>
+</body>
+</html>
